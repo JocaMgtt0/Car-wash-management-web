@@ -2,12 +2,13 @@ import { NavLink, Outlet } from 'react-router-dom'
 import Sidebar from './Sidebar.jsx'
 import { useTema } from '../context/TemaContext.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
+import { usePerfil } from '../context/PerfilContext.jsx'
 import { useDados } from '../context/DadosContext.jsx'
 
 const TABS = [
   { to: '/', rotulo: 'Calendário', icone: '📅', exato: true },
-  { to: '/gastos', rotulo: 'Gastos', icone: '💸' },
-  { to: '/relatorio', rotulo: 'Relatório', icone: '📊' },
+  { to: '/gastos', rotulo: 'Gastos', icone: '💸', perfilExigido: 'dono' },
+  { to: '/relatorio', rotulo: 'Relatório', icone: '📊', perfilExigido: 'dono' },
   { to: '/equipe', rotulo: 'Equipe', icone: '🏷️' },
 ]
 
@@ -31,7 +32,9 @@ function IconeLua() {
 function Layout() {
   const { tema, alternarTema } = useTema()
   const { sair, usuario } = useAuth()
+  const { perfil } = usePerfil()
   const { carregando, erroCarregamento } = useDados()
+  const tabs = TABS.filter((tab) => !tab.perfilExigido || tab.perfilExigido === perfil?.role)
 
   return (
     <div className="app">
@@ -86,7 +89,7 @@ function Layout() {
       </main>
 
       <nav className="tabbar nao-imprimir">
-        {TABS.map((tab) => (
+        {tabs.map((tab) => (
           <NavLink
             key={tab.to}
             to={tab.to}

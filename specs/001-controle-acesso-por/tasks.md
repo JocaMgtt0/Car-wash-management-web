@@ -58,11 +58,11 @@ Projeto único (sem pasta `backend/`): `src/` e `supabase/` na raiz do repositó
 
 **Independent Test**: logar com uma conta de perfil Funcionário e confirmar que `/gastos`, `/relatorio` e a aba de salários em `/equipe` estão inacessíveis, mesmo digitando a URL direto
 
-- [ ] T011 [US1] Criar `src/components/RotaProtegida.jsx`: recebe o perfil exigido, usa `usePerfil()`, redireciona para `/` (`<Navigate replace>`) quando o perfil atual não corresponde
-- [ ] T012 [US1] Em `src/App.jsx`, envolver as rotas `gastos` e `relatorio` com `<RotaProtegida perfilExigido="dono">`
-- [ ] T013 [US1] Em `src/components/Sidebar.jsx`, filtrar os itens "Gastos" e "Relatório" do array `NAVEGACAO` quando `usePerfil().perfil.role !== 'dono'`
-- [ ] T014 [US1] Em `src/pages/ServicosEquipe.jsx`, exibir a aba "Funcionários" (salários, `AbaFuncionarios`) somente quando `role === 'dono'`; a aba "Serviços" (`AbaServicos`) continua visível para os dois perfis, conforme FR-006
-- [ ] T015 [US1] Criar tela `src/pages/AguardandoAcesso.jsx` ("Sua conta ainda não tem acesso liberado.") e usá-la em `src/App.jsx` quando `usuario` existe mas `usePerfil().perfil` é `null` após o carregamento, conforme FR-004 e o edge case "sem perfil vinculado"
+- [x] T011 [US1] Criar `src/components/RotaProtegida.jsx`: recebe o perfil exigido, usa `usePerfil()`, redireciona para `/` (`<Navigate replace>`) quando o perfil atual não corresponde
+- [x] T012 [US1] Em `src/App.jsx`, envolver as rotas `gastos` e `relatorio` com `<RotaProtegida perfilExigido="dono">`
+- [x] T013 [US1] Em `src/components/Sidebar.jsx`, filtrar os itens "Gastos" e "Relatório" do array `NAVEGACAO` quando `usePerfil().perfil.role !== 'dono'` (achado durante a implementação: `src/components/Layout.jsx` tem uma segunda lista `TABS`, duplicada pra tab bar do celular — projeto é mobile-first, filtrada também, senão o funcionário continuaria vendo os links no celular)
+- [x] T014 [US1] Em `src/pages/ServicosEquipe.jsx`, exibir a aba "Funcionários" (salários, `AbaFuncionarios`) somente quando `role === 'dono'`; a aba "Serviços" (`AbaServicos`) continua visível para os dois perfis, conforme FR-006
+- [x] T015 [US1] Criar tela `src/pages/AguardandoAcesso.jsx` ("Sua conta ainda não tem acesso liberado.") e usá-la em `src/App.jsx` quando `usuario` existe mas `usePerfil().perfil` é `null` após o carregamento, conforme FR-004 e o edge case "sem perfil vinculado" (achado durante a implementação: as policies de `lavagens` e da leitura de `valores_padrao` ainda usavam `using (true)`, ou seja, liberavam qualquer autenticado mesmo sem perfil — violava o próprio FR-004. Criada a função `tem_perfil()` e as duas policies reescritas para exigi-la, aplicado via migration no Supabase)
 
 **Checkpoint**: User Story 1 completa e testável de forma independente
 

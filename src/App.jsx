@@ -7,8 +7,10 @@ import Dia from './pages/Dia.jsx'
 import Gastos from './pages/Gastos.jsx'
 import Relatorio from './pages/Relatorio.jsx'
 import ServicosEquipe from './pages/ServicosEquipe.jsx'
+import AguardandoAcesso from './pages/AguardandoAcesso.jsx'
+import RotaProtegida from './components/RotaProtegida.jsx'
 import { useAuth } from './context/AuthContext.jsx'
-import { PerfilProvider } from './context/PerfilContext.jsx'
+import { PerfilProvider, usePerfil } from './context/PerfilContext.jsx'
 import { DadosProvider } from './context/DadosContext.jsx'
 
 function TelaCarregando() {
@@ -22,6 +24,45 @@ function TelaCarregando() {
   )
 }
 
+function ConteudoAutenticado() {
+  const { perfil, carregandoPerfil } = usePerfil()
+
+  if (carregandoPerfil) return <TelaCarregando />
+
+  if (!perfil) return <AguardandoAcesso />
+
+  return (
+    <DadosProvider>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Agenda />} />
+          <Route path="dia/:data" element={<Dia />} />
+          <Route
+            path="gastos"
+            element={
+              <RotaProtegida perfilExigido="dono">
+                <Gastos />
+              </RotaProtegida>
+            }
+          />
+          <Route
+            path="relatorio"
+            element={
+              <RotaProtegida perfilExigido="dono">
+                <Relatorio />
+              </RotaProtegida>
+            }
+          />
+          <Route path="equipe" element={<ServicosEquipe />} />
+          <Route path="valores" element={<Navigate to="/equipe" replace />} />
+          <Route path="login" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+      </Routes>
+    </DadosProvider>
+  )
+}
+
 function App() {
   const { usuario, carregandoSessao } = useAuth()
 
@@ -31,20 +72,7 @@ function App() {
 
   return (
     <PerfilProvider>
-      <DadosProvider>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Agenda />} />
-            <Route path="dia/:data" element={<Dia />} />
-            <Route path="gastos" element={<Gastos />} />
-            <Route path="relatorio" element={<Relatorio />} />
-            <Route path="equipe" element={<ServicosEquipe />} />
-            <Route path="valores" element={<Navigate to="/equipe" replace />} />
-            <Route path="login" element={<Navigate to="/" replace />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Route>
-        </Routes>
-      </DadosProvider>
+      <ConteudoAutenticado />
     </PerfilProvider>
   )
 }

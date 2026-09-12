@@ -3,6 +3,7 @@ import BotaoVoltar from '../components/BotaoVoltar.jsx'
 import { useDados } from '../context/DadosContext.jsx'
 import { useAviso } from '../context/AvisoContext.jsx'
 import { useConfirmacao } from '../context/ConfirmacaoContext.jsx'
+import { usePerfil } from '../context/PerfilContext.jsx'
 import { moeda, paraNumero } from '../lib/format.js'
 
 const PERIODICIDADES = [
@@ -383,6 +384,8 @@ function AbaFuncionarios() {
 
 function ServicosEquipe() {
   const [aba, setAba] = useState('servicos')
+  const { perfil } = usePerfil()
+  const souDono = perfil?.role === 'dono'
 
   return (
     <>
@@ -395,16 +398,18 @@ function ServicosEquipe() {
         </div>
       </div>
 
-      <div className="segmentado largo">
-        <button className={aba === 'servicos' ? 'ativo' : ''} onClick={() => setAba('servicos')}>
-          Serviços
-        </button>
-        <button className={aba === 'equipe' ? 'ativo' : ''} onClick={() => setAba('equipe')}>
-          Funcionários
-        </button>
-      </div>
+      {souDono && (
+        <div className="segmentado largo">
+          <button className={aba === 'servicos' ? 'ativo' : ''} onClick={() => setAba('servicos')}>
+            Serviços
+          </button>
+          <button className={aba === 'equipe' ? 'ativo' : ''} onClick={() => setAba('equipe')}>
+            Funcionários
+          </button>
+        </div>
+      )}
 
-      {aba === 'servicos' ? <AbaServicos /> : <AbaFuncionarios />}
+      {souDono && aba === 'equipe' ? <AbaFuncionarios /> : <AbaServicos />}
     </>
   )
 }

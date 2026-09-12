@@ -91,19 +91,35 @@ as $$
   );
 $$;
 
--- lavagens: dono e funcionário lançam e enxergam igual — é o registro de
--- trabalho do dia a dia, não é dado financeiro sensível por si só.
-create policy "Autenticado tem acesso total" on lavagens
-  for all to authenticated using (true) with check (true);
+-- tem_perfil(): true pra qualquer conta com perfil vinculado (dono OU
+-- funcionario). Sem isso, "authenticated" sozinho bastaria — e uma conta
+-- criada no Supabase mas ainda sem perfil (FR-004) não pode acessar nada.
+create or replace function tem_perfil()
+returns boolean
+language sql
+security definer
+stable
+set search_path = ''
+as $$
+  select exists (
+    select 1 from public.perfis where id = auth.uid()
+  );
+$$;
 
--- valores_padrao: qualquer autenticado LÊ (o funcionário precisa dos preços
--- padrão pra lançar uma lavagem), só o dono cria, edita ou remove um preço.
+-- lavagens: dono e funcionário lançam e enxergam igual — é o registro de
+-- trabalho do dia a dia, não é dado financeiro sensível por si só. Mas
+-- precisa ter perfil vinculado (FR-004), "authenticated" sozinho não basta.
+create policy "Autenticado tem acesso total" on lavagens
+  for all to authenticated using (tem_perfil()) with check (tem_perfil());
+
+-- valores_padrao: qualquer conta COM PERFIL lê (o funcionário precisa dos
+-- preços padrão pra lançar uma lavagem), só o dono cria, edita ou remove.
 -- Precisa derrubar a policy antiga "acesso total" primeiro (RLS combina
 -- policies permissivas com OU, então ela sozinha já liberaria tudo de novo).
 drop policy if exists "Autenticado tem acesso total" on valores_padrao;
 
 create policy "Autenticado le os precos padrao" on valores_padrao
-  for select to authenticated using (true);
+  for select to authenticated using (tem_perfil());
 
 create policy "Dono cria precos padrao" on valores_padrao
   for insert to authenticated with check (is_dono());
