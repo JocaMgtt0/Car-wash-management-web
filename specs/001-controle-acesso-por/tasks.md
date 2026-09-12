@@ -41,12 +41,12 @@ Projeto único (sem pasta `backend/`): `src/` e `supabase/` na raiz do repositó
 - [x] T002 Em `supabase/schema.sql`, criar a função `is_dono()` (`security definer`, `stable`) que retorna `exists(select 1 from perfis where id = auth.uid() and role = 'dono')`, conforme [research.md](./research.md) Decisão 3
 - [x] T003 Em `supabase/schema.sql`, reescrever as policies de `gastos` e `funcionarios` trocando `using (true) with check (true)` por `using (is_dono()) with check (is_dono())`, conforme o contrato em [contracts/politicas-acesso.md](./contracts/politicas-acesso.md)
 - [x] T004 Em `supabase/schema.sql`, ajustar a policy de `valores_padrao`: manter `select` liberado para todo `authenticated`, restringir `insert`/`update`/`delete` a `is_dono()`
-- [x] T005 Em `supabase/schema.sql`, criar as policies de `perfis`: `select` do próprio registro (`id = auth.uid()`) para qualquer autenticado; `insert`/`update`/`delete` restritos a `is_dono()`
+- [x] T005 Em `supabase/schema.sql`, criar as policies de `perfis`: `select` do próprio registro (`id = auth.uid()`) para qualquer autenticado; `insert`/`update`/`delete` restritos a `is_dono()` (ajuste feito durante T008: faltava o dono também ler todos os perfis, exigido por [contracts/politicas-acesso.md](./contracts/politicas-acesso.md) e pelo T018 — policy "Dono le todos os perfis" adicionada)
 - [x] T006 Aplicar o `supabase/schema.sql` atualizado no projeto Supabase "Lava Jato" (via MCP, depois de corrigir o script pra derrubar as policies antigas "Autenticado tem acesso total" de `gastos`, `funcionarios` e `valores_padrao` antes de criar as novas — RLS combina policies permissivas com OU, então a antiga sozinha ainda liberaria tudo)
 - [x] T007 Bootstrap: `manu@lavajato.com` vinculada como perfil `dono` em `perfis`
-- [ ] T008 [P] Criar `apiPerfis` em `src/lib/api.js` (listar, criar/vincular, atualizar, remover), seguindo o mesmo padrão `crud()` já usado para as demais tabelas
-- [ ] T009 [P] Criar `src/context/PerfilContext.jsx`: após login (via `useAuth`), busca o perfil vinculado à conta (`apiPerfis`), expõe `{ perfil, carregandoPerfil }` (`role`, `nome`) por um hook `usePerfil()`
-- [ ] T010 Encaixar `PerfilProvider` em `src/App.jsx`, entre a checagem de `usuario` e o `DadosProvider`, para que o perfil esteja disponível antes de qualquer rota renderizar
+- [x] T008 [P] Criar `apiPerfis` em `src/lib/api.js` (listar, criar/vincular, atualizar, remover), seguindo o mesmo padrão `crud()` já usado para as demais tabelas
+- [x] T009 [P] Criar `src/context/PerfilContext.jsx`: após login (via `useAuth`), busca o perfil vinculado à conta (`apiPerfis`), expõe `{ perfil, carregandoPerfil }` (`role`, `nome`) por um hook `usePerfil()`
+- [x] T010 Encaixar `PerfilProvider` em `src/App.jsx`, entre a checagem de `usuario` e o `DadosProvider`, para que o perfil esteja disponível antes de qualquer rota renderizar
 
 **Checkpoint**: banco e contexto de perfil prontos — as user stories abaixo já podem ser implementadas
 

@@ -127,9 +127,13 @@ create policy "Dono acessa funcionarios" on funcionarios
   for all to authenticated using (is_dono()) with check (is_dono());
 
 -- perfis: qualquer autenticado lê o PRÓPRIO perfil (pra saber sua role ao
--- logar); só o dono cria, edita ou remove o perfil de qualquer conta.
+-- logar); o dono também lê todos os demais (precisa pra listar/gerenciar a
+-- equipe); só o dono cria, edita ou remove o perfil de qualquer conta.
 create policy "Cada um le o proprio perfil" on perfis
   for select to authenticated using (id = auth.uid());
+
+create policy "Dono le todos os perfis" on perfis
+  for select to authenticated using (is_dono());
 
 create policy "Dono cria perfis" on perfis
   for insert to authenticated with check (is_dono());

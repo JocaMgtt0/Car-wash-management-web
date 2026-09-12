@@ -8,6 +8,7 @@ import Gastos from './pages/Gastos.jsx'
 import Relatorio from './pages/Relatorio.jsx'
 import ServicosEquipe from './pages/ServicosEquipe.jsx'
 import { useAuth } from './context/AuthContext.jsx'
+import { PerfilProvider } from './context/PerfilContext.jsx'
 import { DadosProvider } from './context/DadosContext.jsx'
 
 function TelaCarregando() {
@@ -29,20 +30,22 @@ function App() {
   if (!usuario) return <Login />
 
   return (
-    <DadosProvider>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Agenda />} />
-          <Route path="dia/:data" element={<Dia />} />
-          <Route path="gastos" element={<Gastos />} />
-          <Route path="relatorio" element={<Relatorio />} />
-          <Route path="equipe" element={<ServicosEquipe />} />
-          <Route path="valores" element={<Navigate to="/equipe" replace />} />
-          <Route path="login" element={<Navigate to="/" replace />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Route>
-      </Routes>
-    </DadosProvider>
+    <PerfilProvider>
+      <DadosProvider>
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Agenda />} />
+            <Route path="dia/:data" element={<Dia />} />
+            <Route path="gastos" element={<Gastos />} />
+            <Route path="relatorio" element={<Relatorio />} />
+            <Route path="equipe" element={<ServicosEquipe />} />
+            <Route path="valores" element={<Navigate to="/equipe" replace />} />
+            <Route path="login" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Route>
+        </Routes>
+      </DadosProvider>
+    </PerfilProvider>
   )
 }
 
