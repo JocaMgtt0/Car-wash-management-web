@@ -28,7 +28,7 @@ Projeto único (sem pasta `backend/`): `src/` e `supabase/` na raiz do repositó
 
 **Purpose**: Preparar o arquivo de schema antes de qualquer aplicação no banco
 
-- [ ] T001 Atualizar `supabase/schema.sql` acrescentando a definição da tabela `perfis` (ver [data-model.md](./data-model.md)): colunas `id uuid primary key references auth.users(id) on delete cascade`, `nome text not null`, `role text not null check (role in ('dono','funcionario'))`, `created_at timestamptz not null default now()`
+- [x] T001 Atualizar `supabase/schema.sql` acrescentando a definição da tabela `perfis` (ver [data-model.md](./data-model.md)): colunas `id uuid primary key references auth.users(id) on delete cascade`, `nome text not null`, `role text not null check (role in ('dono','funcionario'))`, `created_at timestamptz not null default now()`
 
 ---
 
@@ -38,12 +38,12 @@ Projeto único (sem pasta `backend/`): `src/` e `supabase/` na raiz do repositó
 
 **⚠️ CRITICAL**: nenhuma user story pode ser validada de ponta a ponta antes desta fase estar completa
 
-- [ ] T002 Em `supabase/schema.sql`, criar a função `is_dono()` (`security definer`, `stable`) que retorna `exists(select 1 from perfis where id = auth.uid() and role = 'dono')`, conforme [research.md](./research.md) Decisão 3
-- [ ] T003 Em `supabase/schema.sql`, reescrever as policies de `gastos` e `funcionarios` trocando `using (true) with check (true)` por `using (is_dono()) with check (is_dono())`, conforme o contrato em [contracts/politicas-acesso.md](./contracts/politicas-acesso.md)
-- [ ] T004 Em `supabase/schema.sql`, ajustar a policy de `valores_padrao`: manter `select` liberado para todo `authenticated`, restringir `insert`/`update`/`delete` a `is_dono()`
-- [ ] T005 Em `supabase/schema.sql`, criar as policies de `perfis`: `select` do próprio registro (`id = auth.uid()`) para qualquer autenticado; `insert`/`update`/`delete` restritos a `is_dono()`
-- [ ] T006 Aplicar o `supabase/schema.sql` atualizado no SQL Editor do painel do Supabase (ambiente real do projeto)
-- [ ] T007 Bootstrap manual: `insert into perfis (id, nome, role)` vinculando a conta atual da dona como `'dono'`, conforme [quickstart.md](./quickstart.md) passo 2
+- [x] T002 Em `supabase/schema.sql`, criar a função `is_dono()` (`security definer`, `stable`) que retorna `exists(select 1 from perfis where id = auth.uid() and role = 'dono')`, conforme [research.md](./research.md) Decisão 3
+- [x] T003 Em `supabase/schema.sql`, reescrever as policies de `gastos` e `funcionarios` trocando `using (true) with check (true)` por `using (is_dono()) with check (is_dono())`, conforme o contrato em [contracts/politicas-acesso.md](./contracts/politicas-acesso.md)
+- [x] T004 Em `supabase/schema.sql`, ajustar a policy de `valores_padrao`: manter `select` liberado para todo `authenticated`, restringir `insert`/`update`/`delete` a `is_dono()`
+- [x] T005 Em `supabase/schema.sql`, criar as policies de `perfis`: `select` do próprio registro (`id = auth.uid()`) para qualquer autenticado; `insert`/`update`/`delete` restritos a `is_dono()`
+- [ ] T006 Aplicar o `supabase/schema.sql` atualizado no SQL Editor do painel do Supabase (ambiente real do projeto) — **passo manual seu**, não tenho acesso ao seu painel Supabase
+- [ ] T007 Bootstrap manual: `insert into perfis (id, nome, role)` vinculando a conta atual da dona como `'dono'`, conforme [quickstart.md](./quickstart.md) passo 2 — **passo manual seu**
 - [ ] T008 [P] Criar `apiPerfis` em `src/lib/api.js` (listar, criar/vincular, atualizar, remover), seguindo o mesmo padrão `crud()` já usado para as demais tabelas
 - [ ] T009 [P] Criar `src/context/PerfilContext.jsx`: após login (via `useAuth`), busca o perfil vinculado à conta (`apiPerfis`), expõe `{ perfil, carregandoPerfil }` (`role`, `nome`) por um hook `usePerfil()`
 - [ ] T010 Encaixar `PerfilProvider` em `src/App.jsx`, entre a checagem de `usuario` e o `DadosProvider`, para que o perfil esteja disponível antes de qualquer rota renderizar
