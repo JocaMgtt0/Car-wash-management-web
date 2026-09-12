@@ -84,9 +84,10 @@ returns boolean
 language sql
 security definer
 stable
+set search_path = ''
 as $$
   select exists (
-    select 1 from perfis where id = auth.uid() and role = 'dono'
+    select 1 from public.perfis where id = auth.uid() and role = 'dono'
   );
 $$;
 
@@ -97,6 +98,10 @@ create policy "Autenticado tem acesso total" on lavagens
 
 -- valores_padrao: qualquer autenticado LÊ (o funcionário precisa dos preços
 -- padrão pra lançar uma lavagem), só o dono cria, edita ou remove um preço.
+-- Precisa derrubar a policy antiga "acesso total" primeiro (RLS combina
+-- policies permissivas com OU, então ela sozinha já liberaria tudo de novo).
+drop policy if exists "Autenticado tem acesso total" on valores_padrao;
+
 create policy "Autenticado le os precos padrao" on valores_padrao
   for select to authenticated using (true);
 
@@ -111,6 +116,10 @@ create policy "Dono remove precos padrao" on valores_padrao
 
 -- gastos e funcionarios: dado financeiro e de salário — só o dono acessa,
 -- em nenhuma operação. Funcionário autenticado não vê nem lançamento algum.
+-- Mesmo motivo acima: derrubar a policy antiga antes de criar a restritiva.
+drop policy if exists "Autenticado tem acesso total" on gastos;
+drop policy if exists "Autenticado tem acesso total" on funcionarios;
+
 create policy "Dono acessa gastos" on gastos
   for all to authenticated using (is_dono()) with check (is_dono());
 
