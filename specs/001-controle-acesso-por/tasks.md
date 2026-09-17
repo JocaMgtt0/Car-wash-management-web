@@ -66,6 +66,8 @@ Projeto único (sem pasta `backend/`): `src/` e `supabase/` na raiz do repositó
 
 **Checkpoint**: User Story 1 completa e testável de forma independente
 
+**Incidente pego no teste manual com a Manu**: `is_dono()` ficou quebrada em produção depois do ajuste do aviso de segurança (T006). O `alter function is_dono() set search_path = ''` foi aplicado no banco sem recriar o corpo da função com `public.perfis` (isso só tinha sido corrigido no `schema.sql` local, nunca reaplicado). Com `search_path` vazio e a tabela referenciada sem qualificar o schema, a função quebrava com "relation perfis does not exist" sempre que precisava avaliar uma linha de verdade — só não tinha aparecido antes porque todas as outras tabelas estavam com 0 linhas (RLS nunca chegava a invocar a função). Corrigido recriando `is_dono()` com `public.perfis` no corpo, migration `fix_is_dono_body_schema_qualified`. Lição: `alter function ... set` não substitui recriar a função quando o corpo também mudou.
+
 ---
 
 ## Phase 4: User Story 2 - Dona adiciona um novo funcionário sem e-mail de convite (Priority: P2)
