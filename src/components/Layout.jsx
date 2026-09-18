@@ -46,6 +46,15 @@ function Layout() {
 
         <div className="topbar-espaco" />
 
+        {perfil && (
+          <span className="perfil-badge" title={usuario?.email}>
+            {perfil.nome}
+            <span className="perfil-badge-role">
+              {perfil.role === 'dono' ? 'Dono' : 'Funcionário'}
+            </span>
+          </span>
+        )}
+
         <button
           className="tema-botao"
           onClick={alternarTema}
